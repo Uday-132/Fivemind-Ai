@@ -1,0 +1,36 @@
+import { NextRequest, NextResponse } from 'next/server'
+
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url)
+  const redirectUrl = searchParams.get('redirect') || '/'
+  
+  // Store redirect URL in session/cookie for after auth
+  const response = NextResponse.redirect(getGitHubAuthUrl())
+  response.cookies.set('auth-redirect', redirectUrl, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 60 * 10, // 10 minutes
+    path: '/'
+  })
+  
+  return response
+}
+
+function getGitHubAuthUrl(): string {
+  const clientId = process.env.GITHUB_CLIENT_ID
+  const redirectUri = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/auth/github/callback`
+  
+  if (!clientId) {
+    throw new Error('GITHUB_CLIENT_ID environment variable is required')
+  }
+  
+  const params = new URLSearchParams({
+    client_id: clientId,
+    redirect_uri: redirectUri,
+    scope: 'user:email',
+    state: Math.random().toString(36).substring(2, 15)
+  })
+  
+  return `https://github.com/login/oauth/authorize?${params.toString()}`
+}

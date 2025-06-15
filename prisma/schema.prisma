@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String?  // null for social auth users
+  provider  String   @default("email") // 'email', 'google', 'github', etc.
+  providerId String? // ID from social provider
+  avatar    String?
+  emailVerified Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relations
+  sessions  Session[]
+  executions AgentExecution[]
+  usage     Usage[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  sessionId String   @unique
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  data      String   // JSON string
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  expiresAt DateTime
+}
+
+model AgentExecution {
+  id          String   @id @default(cuid())
+  sessionId   String
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  agentType   String   // 'coding', 'design', 'video', 'research'
+  input       String   // JSON string of input data
+  output      String?  // JSON string of output data
+  status      String   // 'pending', 'processing', 'completed', 'failed'
+  error       String?
+  tokensUsed  Int?
+  duration    Int?     // milliseconds
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Usage {
+  id        String   @id @default(cuid())
+  sessionId String
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  date      DateTime @default(now())
+  agentType String
+  tokens    Int
+  cost      Float    // in cents
+}
