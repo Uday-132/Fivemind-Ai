@@ -1,0 +1,39 @@
+# Vercel ignore file
+# Exclude files that might cause build issues
+
+# Python files (not needed for Next.js deployment)
+*.py
+__pycache__/
+*.pyc
+requirements.txt
+
+# Large dependencies that might cause issues
+node_modules/puppeteer/
+node_modules/.cache/
+
+# Development files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Database files (use environment variables instead)
+prisma/dev.db
+prisma/dev.db-journal
+
+# Temporary files
+tmp/
+temp/
+.cache/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Documentation (not needed for deployment)
+*.md
+!README.md

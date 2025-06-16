@@ -27,6 +27,26 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ['puppeteer']
   },
+  // Webpack configuration to handle problematic packages
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        crypto: false,
+      };
+    }
+    
+    // Exclude puppeteer from client bundle
+    config.externals = config.externals || [];
+    config.externals.push('puppeteer');
+    
+    return config;
+  },
+  // Output configuration for Vercel
+  output: 'standalone',
   // Environment variables (Vercel will handle these automatically)
   env: {
     DATABASE_URL: process.env.DATABASE_URL || '',

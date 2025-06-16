@@ -5,11 +5,15 @@
   "installCommand": "npm install",
   "functions": {
     "app/api/**/*.ts": {
-      "maxDuration": 30
+      "maxDuration": 30,
+      "memory": 1024
     }
   },
-  "env": {
-    "NODE_ENV": "production"
+  "build": {
+    "env": {
+      "NODE_ENV": "production",
+      "SKIP_ENV_VALIDATION": "1"
+    }
   },
   "headers": [
     {
