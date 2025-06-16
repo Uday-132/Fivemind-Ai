@@ -29,9 +29,18 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ['sharp']
   },
-  // Simple webpack configuration
+  // Disable build trace collection to prevent stack overflow
+  output: 'standalone',
+  // Simplified webpack configuration
   webpack: (config, { isServer }) => {
+    // Disable symlinks to prevent circular references
     config.resolve.symlinks = false;
+    
+    // Optimize resolve configuration
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': require('path').resolve(__dirname, './'),
+    };
     
     if (!isServer) {
       config.resolve.fallback = {
@@ -42,6 +51,9 @@ const nextConfig = {
         crypto: false,
       };
     }
+    
+    // Optimize module resolution
+    config.resolve.modules = ['node_modules'];
     
     return config;
   },
