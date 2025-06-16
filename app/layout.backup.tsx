@@ -3,6 +3,11 @@ import './globals.css'
 import { Providers } from './providers'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
+import { AdvancedCursor } from '@/components/ui/advanced-cursor'
+import { AnimatedBackground, FloatingElements } from '@/components/ui/animated-background'
+import { PageTransition } from '@/components/ui/page-transition'
+import { FloatingActionMenu } from '@/components/ui/floating-action-menu'
+import { PageLoading } from '@/components/ui/page-loading'
 
 export const metadata: Metadata = {
   title: 'AI Agents Platform',
@@ -30,15 +35,23 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body style={{ fontFamily: '"Courier New", monospace' }}>
+      <body className="cursor-none" style={{ fontFamily: '"Courier New", monospace' }}>
         <Providers>
-          <div className="min-h-screen flex flex-col">
-            <Header />
-            <main className="flex-1">
-              {children}
-            </main>
-            <Footer />
-          </div>
+          <AdvancedCursor>
+            <AnimatedBackground />
+            <FloatingElements />
+            <PageLoading />
+            <div className="min-h-screen flex flex-col relative z-10">
+              <Header />
+              <main className="flex-1">
+                <PageTransition>
+                  {children}
+                </PageTransition>
+              </main>
+              <Footer />
+              <FloatingActionMenu />
+            </div>
+          </AdvancedCursor>
         </Providers>
       </body>
     </html>

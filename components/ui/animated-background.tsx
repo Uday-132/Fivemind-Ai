@@ -7,12 +7,18 @@ export function AnimatedBackground() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
 
   useEffect(() => {
+    if (typeof window === 'undefined') return
+
     const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY })
     }
 
     window.addEventListener('mousemove', handleMouseMove)
-    return () => window.removeEventListener('mousemove', handleMouseMove)
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('mousemove', handleMouseMove)
+      }
+    }
   }, [])
 
   return (

@@ -21,6 +21,9 @@ export function AdvancedCursor({ children }: CursorProps) {
   const cursorYSpring = useSpring(cursorY, springConfig)
 
   useEffect(() => {
+    // Check if we're in the browser
+    if (typeof window === 'undefined') return
+
     const moveCursor = (e: MouseEvent) => {
       cursorX.set(e.clientX - 16)
       cursorY.set(e.clientY - 16)
@@ -92,9 +95,11 @@ export function AdvancedCursor({ children }: CursorProps) {
     })
 
     return () => {
-      window.removeEventListener('mousemove', moveCursor)
-      window.removeEventListener('mouseenter', handleMouseEnter)
-      window.removeEventListener('mouseleave', handleMouseLeave)
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('mousemove', moveCursor)
+        window.removeEventListener('mouseenter', handleMouseEnter)
+        window.removeEventListener('mouseleave', handleMouseLeave)
+      }
       
       buttons.forEach(button => {
         button.removeEventListener('mouseenter', handleButtonHover)
