@@ -12,7 +12,7 @@ export function Footer() {
               <span className="font-bold">AI Agents</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              Powerful AI agents for coding, design, image generation, and research automation.
+              Powerful AI agents for coding, design, image generation, research automation, and movie recommendations.
             </p>
           </div>
 
@@ -23,6 +23,7 @@ export function Footer() {
               <li><Link href="/agents/design" className="text-muted-foreground hover:text-primary transition-colors">Design Agent</Link></li>
               <li><Link href="/agents/image" className="text-muted-foreground hover:text-primary transition-colors">Image Agent</Link></li>
               <li><Link href="/agents/research" className="text-muted-foreground hover:text-primary transition-colors">Research Agent</Link></li>
+              <li><Link href="/agents/movie" className="text-muted-foreground hover:text-primary transition-colors">Movie Agent</Link></li>
             </ul>
           </div>
         </div>

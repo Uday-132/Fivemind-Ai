@@ -34,7 +34,7 @@ export function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            Four Powerful AI Agents
+            Five Powerful AI Agents
             <br />
             <AnimatedGradientText>
               One Platform
@@ -49,8 +49,8 @@ export function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            Automate your workflow with specialized AI agents for coding, design, video analysis, 
-            and research. Fast, reliable, and cost-effective solutions for modern developers.
+            Automate your workflow with specialized AI agents for coding, design, image generation, 
+            research, and movie recommendations. Fast, reliable, and cost-effective solutions for modern developers.
           </motion.p>
         </StaggerItem>
         
@@ -84,7 +84,7 @@ export function Hero() {
             transition={{ duration: 0.8, delay: 0.8 }}
           >
             {[
-              { value: "4", label: "AI Agents" },
+              { value: "5", label: "AI Agents" },
               { value: "99.9%", label: "Uptime" },
               { value: "<2s", label: "Response Time" },
               { value: "Free", label: "Per Request" }

@@ -4,7 +4,7 @@ import { AnimatedCard } from '@/components/ui/animated-card'
 import { LoadingButton } from '@/components/ui/loading-button'
 import { StaggerContainer, StaggerItem } from '@/components/ui/page-transition'
 import { AnimatedGradientText } from '@/components/ui/animated-background'
-import { Code, Palette, Image, Search } from 'lucide-react'
+import { Code, Palette, Image, Search, Film } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 const agents = [
@@ -47,6 +47,16 @@ const agents = [
     href: '/agents/research',
     color: 'text-orange-500',
     bgColor: 'bg-orange-50 dark:bg-orange-950/20'
+  },
+  {
+    id: 'movie',
+    title: 'Movie Recommendation Agent',
+    description: 'Discover movies based on your mood and preferred language from IMDb.',
+    icon: Film,
+    features: ['Mood-Based Search', 'Multi-Language', 'IMDb Integration', 'Real-time Data'],
+    href: '/agents/movie',
+    color: 'text-red-500',
+    bgColor: 'bg-red-50 dark:bg-red-950/20'
   }
 ]
 
@@ -77,7 +87,7 @@ export function AgentGrid() {
           </div>
         </StaggerItem>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {agents.map((agent, index) => {
             const Icon = agent.icon
             return (
@@ -141,7 +151,8 @@ export function AgentGrid() {
                       {agent.id === 'coding' ? 'Coding Agent' : 
                        agent.id === 'design' ? 'Design Agent' : 
                        agent.id === 'image' ? 'Image Agent' : 
-                       agent.id === 'research' ? 'Research Agent' : agent.title}
+                       agent.id === 'research' ? 'Research Agent' : 
+                       agent.id === 'movie' ? 'Movie Agent' : agent.title}
                     </LoadingButton>
                   </div>
                 </AnimatedCard>

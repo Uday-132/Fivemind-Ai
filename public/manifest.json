@@ -1,7 +1,7 @@
 {
   "name": "AI Agents Platform",
   "short_name": "AI Agents",
-  "description": "Powerful AI agents for coding, design, image generation, and research automation",
+  "description": "Powerful AI agents for coding, design, image generation, research automation, and movie recommendations",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

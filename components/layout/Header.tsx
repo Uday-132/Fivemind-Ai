@@ -15,6 +15,7 @@ export function Header() {
     { name: 'Design Agent', href: '/agents/design' },
     { name: 'Image Agent', href: '/agents/image' },
     { name: 'Research Agent', href: '/agents/research' },
+    { name: 'Movie Agent', href: '/agents/movie' },
   ]
 
   return (

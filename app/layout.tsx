@@ -11,8 +11,8 @@ import { PageLoading } from '@/components/ui/page-loading'
 
 export const metadata: Metadata = {
   title: 'AI Agents Platform',
-  description: 'Powerful AI agents for coding, design, image generation, and research automation',
-  keywords: 'AI, agents, coding, design, image generation, research, automation',
+  description: 'Powerful AI agents for coding, design, image generation, research automation, and movie recommendations',
+  keywords: 'AI, agents, coding, design, image generation, research, automation, movie recommendations, IMDb',
   authors: [{ name: 'AI Agents Platform' }],
   creator: 'AI Agents Platform',
   publisher: 'AI Agents Platform',
