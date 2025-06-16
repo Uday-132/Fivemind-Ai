@@ -27,6 +27,12 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ['puppeteer']
   },
+  // Suppress edge runtime warnings
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
+  },
   // Webpack configuration to handle problematic packages
   webpack: (config, { isServer }) => {
     if (!isServer) {
