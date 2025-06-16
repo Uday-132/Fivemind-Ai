@@ -23,18 +23,21 @@ const nextConfig = {
       }
     ]
   },
+  // Disable problematic features that cause build issues
+  swcMinify: true,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
   // Optimize for Vercel deployment
   experimental: {
-    serverComponentsExternalPackages: ['puppeteer']
-  },
-  // Suppress edge runtime warnings
-  logging: {
-    fetches: {
-      fullUrl: true,
-    },
+    serverComponentsExternalPackages: ['puppeteer', 'sharp'],
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons']
   },
   // Webpack configuration to handle problematic packages
-  webpack: (config, { isServer }) => {
+  webpack: (config, { isServer, dev }) => {
+    // Reduce recursion depth to prevent stack overflow
+    config.resolve.symlinks = false;
+    
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -42,17 +45,45 @@ const nextConfig = {
         net: false,
         tls: false,
         crypto: false,
+        stream: false,
+        url: false,
+        zlib: false,
+        http: false,
+        https: false,
+        assert: false,
+        os: false,
+        path: false,
       };
     }
     
-    // Exclude puppeteer from client bundle
+    // Exclude problematic packages
     config.externals = config.externals || [];
-    config.externals.push('puppeteer');
+    if (isServer) {
+      config.externals.push('puppeteer', 'sharp');
+    }
+    
+    // Optimize module resolution
+    config.resolve.modules = ['node_modules'];
+    
+    // Prevent circular dependencies
+    config.optimization = {
+      ...config.optimization,
+      splitChunks: {
+        chunks: 'all',
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+          },
+        },
+      },
+    };
     
     return config;
   },
-  // Output configuration for Vercel
-  output: 'standalone',
+  // Disable source maps in production to reduce build complexity
+  productionBrowserSourceMaps: false,
   // Environment variables (Vercel will handle these automatically)
   env: {
     DATABASE_URL: process.env.DATABASE_URL || '',

@@ -10,12 +10,16 @@ requirements.txt
 # Large dependencies that might cause issues
 node_modules/puppeteer/
 node_modules/.cache/
+node_modules/sharp/
+node_modules/@types/
 
 # Development files
 .vscode/
 .idea/
 *.swp
 *.swo
+.git/
+.gitignore
 
 # Logs
 *.log
@@ -29,6 +33,7 @@ prisma/dev.db-journal
 tmp/
 temp/
 .cache/
+.next/cache/
 
 # OS files
 .DS_Store
@@ -37,3 +42,14 @@ Thumbs.db
 # Documentation (not needed for deployment)
 *.md
 !README.md
+
+# PowerShell scripts
+*.ps1
+
+# Build artifacts that might cause recursion
+.next/trace
+.next/server/
+.next/static/chunks/
+
+# Source maps
+*.map
