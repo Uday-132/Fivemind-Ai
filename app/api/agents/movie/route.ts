@@ -78,12 +78,6 @@ const URL_MAPPINGS = {
 // Function to call the Python script with timeout
 const callPythonScript = async (emotion: string, language: string): Promise<MovieRecommendation> => {
   return new Promise((resolve, reject) => {
-    // Set a timeout for the Python script execution (5 seconds)
-    const timeout = setTimeout(() => {
-      pythonProcess.kill()
-      reject(new Error('Python script execution timeout'))
-    }, 5000)
-
     const pythonProcess = spawn('python', ['-c', `
 import sys
 sys.path.append('${process.cwd().replace(/\\/g, '\\\\')}')
@@ -93,6 +87,12 @@ import json
 result = get_movie_recommendations('${emotion}', '${language}')
 print(json.dumps(result))
 `])
+
+    // Set a timeout for the Python script execution (3 seconds)
+    const timeout = setTimeout(() => {
+      pythonProcess.kill()
+      reject(new Error('Python script execution timeout'))
+    }, 3000)
 
     let output = ''
     let errorOutput = ''
@@ -298,22 +298,14 @@ export async function POST(request: NextRequest) {
 
     let result: MovieRecommendation
 
-    // In production, skip Python script to avoid timeouts and use mock data directly
-    const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production'
-    
-    if (isProduction) {
-      console.log('Production environment detected, using mock data for faster response')
+    try {
+      // Try to use the Python script first with short timeout
+      result = await callPythonScript(emotion, language)
+      console.log('Successfully used Python script')
+    } catch (error) {
+      console.log('Python script failed, using mock data:', error)
+      // Fallback to mock data if Python script fails
       result = await generateMockMovieData(emotion, language)
-    } else {
-      try {
-        // Try to use the Python script first in development
-        result = await callPythonScript(emotion, language)
-        console.log('Successfully used Python script')
-      } catch (error) {
-        console.log('Python script failed, using mock data:', error)
-        // Fallback to mock data if Python script fails
-        result = await generateMockMovieData(emotion, language)
-      }
     }
 
     return NextResponse.json(result)
