@@ -3,6 +3,7 @@ import './globals.css'
 import { Providers } from './providers'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
+import { AdvancedCursor } from '@/components/ui/advanced-cursor'
 
 export const metadata: Metadata = {
   title: 'Five Mind AI',
@@ -32,13 +33,15 @@ export default function RootLayout({
     <html lang="en">
       <body style={{ fontFamily: '"Courier New", monospace' }}>
         <Providers>
-          <div className="min-h-screen flex flex-col">
-            <Header />
-            <main className="flex-1">
-              {children}
-            </main>
-            <Footer />
-          </div>
+          <AdvancedCursor>
+            <div className="min-h-screen flex flex-col">
+              <Header />
+              <main className="flex-1">
+                {children}
+              </main>
+              <Footer />
+            </div>
+          </AdvancedCursor>
         </Providers>
       </body>
     </html>

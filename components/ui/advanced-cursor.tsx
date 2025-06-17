@@ -10,7 +10,8 @@ interface CursorProps {
 export function AdvancedCursor({ children }: CursorProps) {
   const [isHovering, setIsHovering] = useState(false)
   const [cursorText, setCursorText] = useState('')
-  const [cursorVariant, setCursorVariant] = useState('default')
+  type CursorVariantType = 'default' | 'hover' | 'button' | 'link' | 'text';
+  const [cursorVariant, setCursorVariant] = useState<CursorVariantType>('default')
   const [isVisible, setIsVisible] = useState(false)
   
   const cursorX = useMotionValue(-100)
@@ -21,13 +22,17 @@ export function AdvancedCursor({ children }: CursorProps) {
   const cursorYSpring = useSpring(cursorY, springConfig)
 
   useEffect(() => {
-    // Check if we're in the browser
+    // Check if we're in the browser and on a desktop device
     if (typeof window === 'undefined') return
+    
+    // Only enable custom cursor on desktop devices
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    if (isMobile) return
 
     const moveCursor = (e: MouseEvent) => {
       cursorX.set(e.clientX - 16)
       cursorY.set(e.clientY - 16)
-      setIsVisible(true)
+      if (!isVisible) setIsVisible(true)
     }
 
     const handleMouseEnter = () => setIsVisible(true)
@@ -164,7 +169,6 @@ export function AdvancedCursor({ children }: CursorProps) {
           x: cursorXSpring,
           y: cursorYSpring,
         }}
-        animate={cursorVariant}
         variants={cursorVariants}
         transition={{
           type: "spring",
@@ -172,7 +176,10 @@ export function AdvancedCursor({ children }: CursorProps) {
           damping: 28
         }}
         initial={{ opacity: 0 }}
-        whileInView={{ opacity: isVisible ? 1 : 0 }}
+        animate={{
+          ...cursorVariants[cursorVariant],
+          opacity: isVisible ? 1 : 0
+        }}
       />
       
       {/* Cursor Text */}
@@ -205,7 +212,7 @@ export function AdvancedCursor({ children }: CursorProps) {
           damping: 20
         }}
         initial={{ opacity: 0 }}
-        whileInView={{ opacity: isVisible ? 0.6 : 0 }}
+        animate={{ opacity: isVisible ? 0.6 : 0 }}
       />
 
       {children}

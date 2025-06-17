@@ -9,9 +9,18 @@
   }
 }
 
-/* Custom cursor styles */
-* {
-  cursor: auto;
+/* Custom cursor styles - hide default cursor on desktop */
+@media (hover: hover) and (pointer: fine) {
+  * {
+    cursor: none !important;
+  }
+}
+
+/* Show default cursor on mobile/touch devices */
+@media (hover: none) or (pointer: coarse) {
+  * {
+    cursor: auto !important;
+  }
 }
 
 /* Enhanced cursor for interactive elements */
