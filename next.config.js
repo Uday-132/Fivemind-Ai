@@ -57,13 +57,13 @@ const nextConfig = {
     
     return config;
   },
-  // Environment variables
+  // Environment variables (only expose what's needed)
   env: {
-    DATABASE_URL: process.env.DATABASE_URL || '',
     DEEPSEEK_API_KEY: process.env.DEEPSEEK_API_KEY || '',
     GROQ_API_KEY: process.env.GROQ_API_KEY || '',
     FIGMA_ACCESS_TOKEN: process.env.FIGMA_ACCESS_TOKEN || '',
     SESSION_SECRET: process.env.SESSION_SECRET || '',
+    // Don't expose DATABASE_URL in client-side code
   }
 }
 

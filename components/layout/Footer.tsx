@@ -9,7 +9,7 @@ export function Footer() {
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <Brain className="h-6 w-6 text-primary" />
-              <span className="font-bold">AI Agents</span>
+              <span className="font-bold">Five Mind AI</span>
             </div>
             <p className="text-sm text-muted-foreground">
               Powerful AI agents for coding, design, image generation, research automation, and movie recommendations.

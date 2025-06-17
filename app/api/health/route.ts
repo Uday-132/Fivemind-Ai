@@ -14,8 +14,7 @@ export async function GET() {
         external: Math.round(process.memoryUsage().external / 1024 / 1024),
       },
       services: {
-        api: 'operational',
-        database: 'checking...',
+        api: 'operational'
       }
     }
 

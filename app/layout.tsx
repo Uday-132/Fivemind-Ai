@@ -5,12 +5,12 @@ import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 
 export const metadata: Metadata = {
-  title: 'AI Agents Platform',
+  title: 'Five Mind AI',
   description: 'Powerful AI agents for coding, design, image generation, research automation, and movie recommendations',
   keywords: 'AI, agents, coding, design, image generation, research, automation, movie recommendations, IMDb',
-  authors: [{ name: 'AI Agents Platform' }],
-  creator: 'AI Agents Platform',
-  publisher: 'AI Agents Platform',
+  authors: [{ name: 'Five Mind AI' }],
+  creator: 'Five Mind AI',
+  publisher: 'Five Mind AI',
   formatDetection: {
     email: false,
     address: false,

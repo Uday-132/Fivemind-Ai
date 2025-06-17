@@ -68,10 +68,7 @@ In your Vercel dashboard:
 
 ### Required (for basic functionality):
 ```
-DATABASE_URL=file:./dev.db
-SESSION_SECRET=your_super_secret_session_key_here_make_it_long_and_random
-JWT_SECRET=your_jwt_secret_key_here_also_make_it_long_and_random
-NEXTAUTH_URL=https://your-app-name.vercel.app
+# No required environment variables for basic functionality
 ```
 
 ### Optional (for enhanced features):
@@ -81,55 +78,16 @@ GROQ_API_KEY=your_groq_api_key_here
 GEMINI_API_KEY=your_gemini_api_key_here
 HUGGING_FACE_API_KEY=your_huggingface_api_key_here
 DEEPAI_API_KEY=your_deepai_api_key_here
-GOOGLE_CLIENT_ID=your_google_client_id_here
-GOOGLE_CLIENT_SECRET=your_google_client_secret_here
-GITHUB_CLIENT_ID=your_github_client_id_here
-GITHUB_CLIENT_SECRET=your_github_client_secret_here
+
 FIGMA_ACCESS_TOKEN=your_figma_token_here
 YOUTUBE_API_KEY=your_youtube_api_key_here
 ```
 
-## Step 4: Database Setup for Production
-
-### Option A: Use Vercel Postgres (Recommended)
-1. In Vercel dashboard → **Storage** → **Create Database**
-2. Choose **Postgres**
-3. Copy the connection string to `DATABASE_URL`
-
-### Option B: Use Supabase (Free)
-1. Go to https://supabase.com
-2. Create new project
-3. Go to **Settings** → **Database**
-4. Copy connection string to `DATABASE_URL`
-
-### Option C: Use PlanetScale (Free tier available)
-1. Go to https://planetscale.com
-2. Create database
-3. Get connection string
-
-## Step 5: Update Database URL
-
-Update your `DATABASE_URL` in Vercel environment variables:
-```
-DATABASE_URL=postgresql://username:password@host:port/database
-```
-
-## Step 6: Deploy Database Schema
-
-After setting up the database:
-
-1. **Update your local `.env`** with the production database URL
-2. **Push the schema**:
-```bash
-npx prisma db push
-```
-
-## Step 7: Final Deployment
+## Step 4: Final Deployment
 
 1. **Redeploy** your application in Vercel dashboard
 2. **Test all features**:
    - Image generation (should work with free Pollinations.AI)
-   - User authentication
    - All agent functionalities
 
 ## 🎉 Your App is Live!
@@ -149,9 +107,7 @@ Your AI Agents Platform will be available at:
    - Make sure all required env vars are set
    - Redeploy after adding new env vars
 
-3. **Database Connection**:
-   - Verify `DATABASE_URL` is correct
-   - Run `npx prisma db push` with production URL
+
 
 4. **API Routes Not Working**:
    - Check function logs in Vercel dashboard

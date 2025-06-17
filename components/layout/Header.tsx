@@ -23,7 +23,7 @@ export function Header() {
       <div className="container flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center space-x-2">
           <Brain className="h-8 w-8 text-primary" />
-          <span className="text-xl font-bold">AI Agents</span>
+          <span className="text-xl font-bold">Five Mind AI</span>
         </Link>
 
         {/* Desktop Navigation */}

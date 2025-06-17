@@ -11,7 +11,6 @@
   "build": {
     "env": {
       "NODE_ENV": "production",
-      "SKIP_ENV_VALIDATION": "1",
       "NEXT_TELEMETRY_DISABLED": "1",
       "NODE_OPTIONS": "--max-old-space-size=4096"
     }
