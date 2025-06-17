@@ -138,60 +138,148 @@ Be specific and accurate based on what you see in the image.
           typography: 'Editorial typography optimized for reading',
           theme: 'Clean blog interface'
         }
+      },
+      {
+        analysis: {
+          components: ['Portfolio Grid', 'Project Cards', 'About Section', 'Contact Form', 'Skills List'],
+          layout: 'Portfolio layout with project showcase and personal branding',
+          colors: ['#EC4899', '#1F2937', '#FDF2F8', '#8B5CF6', '#F59E0B'],
+          typography: 'Creative typography with personality and visual hierarchy',
+          theme: 'Creative portfolio design'
+        }
+      },
+      {
+        analysis: {
+          components: ['Team Cards', 'Company Stats', 'Mission Statement', 'Values Grid', 'Contact Info'],
+          layout: 'About page layout with team showcase and company information',
+          colors: ['#0EA5E9', '#1E293B', '#F0F9FF', '#10B981', '#F97316'],
+          typography: 'Corporate typography with trust and professionalism',
+          theme: 'Professional about page'
+        }
+      },
+      {
+        analysis: {
+          components: ['Event Cards', 'Calendar View', 'Registration Form', 'Speaker Profiles', 'Schedule'],
+          layout: 'Event page layout with calendar and registration system',
+          colors: ['#7C3AED', '#1F2937', '#F5F3FF', '#EF4444', '#059669'],
+          typography: 'Event typography with excitement and clarity',
+          theme: 'Dynamic event interface'
+        }
+      },
+      {
+        analysis: {
+          components: ['Service Cards', 'Pricing Table', 'Testimonials', 'FAQ Section', 'Contact CTA'],
+          layout: 'Service page layout with pricing and social proof',
+          colors: ['#DC2626', '#1F2937', '#FEF2F2', '#3B82F6', '#10B981'],
+          typography: 'Service typography with trust and conversion focus',
+          theme: 'Professional service page'
+        }
+      },
+      {
+        analysis: {
+          components: ['News Feed', 'Article Cards', 'Category Filters', 'Search Widget', 'Newsletter Signup'],
+          layout: 'News layout with feed and filtering system',
+          colors: ['#1D4ED8', '#1F2937', '#EFF6FF', '#F59E0B', '#059669'],
+          typography: 'News typography with readability and hierarchy',
+          theme: 'Modern news interface'
+        }
       }
     ]
     
-    // Use timestamp to ensure different results over time
-    const timeBasedIndex = Math.floor(Date.now() / 10000) % fallbackVariations.length
-    const randomVariation = fallbackVariations[timeBasedIndex]
-    const codeResult = await generateCodeFromAnalysis(randomVariation.analysis, 'Fallback analysis')
+    // Add more randomization for varied results
+    const randomSeed = Math.random() * 1000 + Date.now()
+    const randomIndex = Math.floor(randomSeed) % fallbackVariations.length
+    const selectedVariation = fallbackVariations[randomIndex]
+    
+    // Add random variations to the selected template
+    const enhancedAnalysis = {
+      ...selectedVariation.analysis,
+      // Add random elements to make each result unique
+      uniqueId: Math.random().toString(36).substring(7),
+      timestamp: new Date().toISOString(),
+      // Randomly modify colors slightly
+      colors: selectedVariation.analysis.colors?.map(color => {
+        // Occasionally modify the color slightly
+        if (Math.random() > 0.7) {
+          const variations = ['50', '100', '200', '300', '400', '500', '600', '700', '800', '900']
+          const randomVariation = variations[Math.floor(Math.random() * variations.length)]
+          return color.includes('#') ? color : `${color}-${randomVariation}`
+        }
+        return color
+      }),
+      // Add random component variations
+      components: selectedVariation.analysis.components?.map(comp => {
+        const modifiers = ['Enhanced', 'Modern', 'Interactive', 'Responsive', 'Dynamic']
+        if (Math.random() > 0.8) {
+          const modifier = modifiers[Math.floor(Math.random() * modifiers.length)]
+          return `${modifier} ${comp}`
+        }
+        return comp
+      })
+    }
+    
+    const codeResult = await generateCodeFromAnalysis(enhancedAnalysis, `Fallback analysis with variations - ${enhancedAnalysis.uniqueId}`)
     
     return {
-      ...randomVariation,
-      ...codeResult
+      analysis: enhancedAnalysis,
+      ...codeResult,
+      generatedAt: new Date().toISOString(),
+      variant: `fallback-${randomIndex}-${enhancedAnalysis.uniqueId}`
     }
   }
 }
 
 async function generateCodeFromAnalysis(analysis: any, fullAnalysis: string) {
+  // Add randomization to the prompt for more varied results
+  const layoutStyles = ['flexbox with flex-col', 'CSS Grid with grid-rows', 'block layout with vertical flow']
+  const spacingOptions = ['space-y-6', 'space-y-8', 'space-y-4', 'gap-6', 'gap-8']
+  const containerStyles = ['max-w-4xl mx-auto', 'max-w-6xl mx-auto', 'container mx-auto', 'w-full max-w-screen-xl mx-auto']
+  
+  const randomLayout = layoutStyles[Math.floor(Math.random() * layoutStyles.length)]
+  const randomSpacing = spacingOptions[Math.floor(Math.random() * spacingOptions.length)]
+  const randomContainer = containerStyles[Math.floor(Math.random() * containerStyles.length)]
+  
+  const uniqueId = analysis.uniqueId || Math.random().toString(36).substring(7)
+  
   const prompt = `
-Based on this design analysis, generate clean, modern React component code with Tailwind CSS following a TOP-TO-BOTTOM layout structure:
+Create a unique, modern React component with Tailwind CSS. Use this specific configuration:
 
-Analysis:
+DESIGN REQUIREMENTS:
 - Components: ${analysis.components?.join(', ') || 'Modern UI components'}
-- Layout: ${analysis.layout || 'Responsive layout'}
+- Layout Style: ${randomLayout}
+- Container: ${randomContainer}
+- Spacing: ${randomSpacing}
 - Colors: ${analysis.colors?.join(', ') || 'Modern color palette'}
 - Typography: ${analysis.typography || 'Clean typography'}
 - Theme: ${analysis.theme || 'Modern design'}
+- Unique ID: ${uniqueId}
 
-Full Analysis Context:
-${fullAnalysis}
+LAYOUT STRUCTURE (TOP-TO-BOTTOM):
+1. Header/Navigation (if needed) - sticky or fixed at top
+2. Hero/Banner section - prominent visual element
+3. Main content sections - stacked vertically
+4. Footer (if needed) - at bottom
 
-IMPORTANT: Structure the component in TOP-TO-BOTTOM sequence:
-1. Header/Navigation (if applicable) - at the very top
-2. Hero/Main content section - below header
-3. Content sections - arranged vertically from top to bottom
-4. Footer (if applicable) - at the very bottom
+TECHNICAL REQUIREMENTS:
+- Use ${randomLayout} for vertical stacking
+- Apply ${randomSpacing} for consistent spacing
+- Implement ${randomContainer} for responsive width
+- Include hover effects and transitions
+- Add proper semantic HTML tags
+- Ensure mobile-first responsive design
+- Use modern Tailwind CSS classes
 
-Generate a complete, functional React component that:
-1. Follows strict top-to-bottom vertical layout
-2. Uses flexbox or grid with column direction
-3. Is responsive and mobile-friendly
-4. Has proper spacing between sections
-5. Uses semantic HTML structure
-6. Is accessible with proper ARIA labels
-
-IMPORTANT: Format your response as valid JSON only. Do not include any text before or after the JSON. Escape all quotes and special characters properly.
+IMPORTANT: Return ONLY valid JSON. No additional text or explanations.
 
 {
   "code": {
-    "react": "Complete React component with TOP-TO-BOTTOM layout using Tailwind CSS",
-    "html": "Equivalent HTML structure with vertical flow", 
-    "css": "Equivalent CSS styles with top-to-bottom layout"
+    "react": "Complete functional React component with unique design and ${randomLayout}",
+    "html": "Clean HTML structure with semantic elements and vertical flow",
+    "css": "Modern CSS with Tailwind classes and responsive design"
   }
 }
 
-Ensure all sections flow vertically from top to bottom with clear visual hierarchy. Make sure all strings in the JSON are properly escaped.
+Make each component unique with creative use of the specified colors and layout style.
 `
 
   try {
@@ -208,7 +296,7 @@ Ensure all sections flow vertically from top to bottom with clear visual hierarc
         }
       ],
       max_tokens: 3000,
-      temperature: 0.3
+      temperature: 0.7
     })
 
     const content = response.choices[0]?.message?.content
