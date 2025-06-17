@@ -14,7 +14,10 @@ export async function GET() {
         external: Math.round(process.memoryUsage().external / 1024 / 1024),
       },
       services: {
-        api: 'operational'
+        api: 'operational',
+        groq: process.env.GROQ_API_KEY ? 'configured' : 'missing',
+        deepseek: process.env.DEEPSEEK_API_KEY ? 'configured' : 'missing',
+        figma: process.env.FIGMA_ACCESS_TOKEN ? 'configured' : 'missing'
       }
     }
 

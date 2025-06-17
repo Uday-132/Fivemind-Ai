@@ -2,10 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { OpenAI } from 'openai'
 import * as cheerio from 'cheerio'
 
-const openai = new OpenAI({
-  apiKey: process.env.GROQ_API_KEY,
-  baseURL: 'https://api.groq.com/openai/v1',
-})
+// Initialize OpenAI client with error handling
+const initializeOpenAI = () => {
+  const apiKey = process.env.GROQ_API_KEY
+  if (!apiKey) {
+    throw new Error('GROQ_API_KEY environment variable is not set')
+  }
+  
+  return new OpenAI({
+    apiKey: apiKey,
+    baseURL: 'https://api.groq.com/openai/v1',
+  })
+}
 
 interface LeetCodeProblem {
   title: string
@@ -150,6 +158,7 @@ Format your response as JSON with this structure:
 }
 `
 
+  const openai = initializeOpenAI()
   const response = await openai.chat.completions.create({
     model: 'llama-3.3-70b-versatile',
     messages: [
@@ -190,6 +199,14 @@ Format your response as JSON with this structure:
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if API key is available
+    if (!process.env.GROQ_API_KEY) {
+      return NextResponse.json(
+        { error: 'AI service is not configured. Please check environment variables.' },
+        { status: 503 }
+      )
+    }
+
     const { url } = await request.json()
 
     if (!url || typeof url !== 'string') {
@@ -207,11 +224,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    console.log('Processing LeetCode URL:', url)
+
     // Scrape problem details
     const problem = await scrapeLeetCodeProblem(url)
+    console.log('Problem scraped:', problem.title)
     
     // Generate solution
     const aiResponse = await solveProblem(problem)
+    console.log('AI response generated successfully')
 
     const result = {
       problem,
@@ -222,8 +243,31 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Coding agent error:', error)
+    
+    // Provide more specific error messages
+    if (error instanceof Error) {
+      if (error.message.includes('API key')) {
+        return NextResponse.json(
+          { error: 'AI service authentication failed. Please check API configuration.' },
+          { status: 503 }
+        )
+      }
+      if (error.message.includes('rate limit')) {
+        return NextResponse.json(
+          { error: 'Rate limit exceeded. Please try again in a few minutes.' },
+          { status: 429 }
+        )
+      }
+      if (error.message.includes('timeout')) {
+        return NextResponse.json(
+          { error: 'Request timeout. Please try again.' },
+          { status: 408 }
+        )
+      }
+    }
+    
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: error instanceof Error ? error.message : 'Failed to solve problem. Please try again.' },
       { status: 500 }
     )
   }
