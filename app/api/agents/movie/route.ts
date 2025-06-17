@@ -300,12 +300,22 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Movie recommendation error:', error)
+    
+    // Ensure we always return valid JSON
+    const errorMessage = error instanceof Error ? error.message : 'Failed to get movie recommendations'
+    
     return NextResponse.json(
       { 
-        error: error instanceof Error ? error.message : 'Failed to get movie recommendations',
-        details: 'Check server logs for more information'
+        error: errorMessage,
+        details: 'Check server logs for more information',
+        timestamp: new Date().toISOString()
       },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
     )
   }
 }

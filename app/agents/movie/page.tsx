@@ -51,12 +51,26 @@ export default function MovieAgentPage() {
         body: JSON.stringify({ emotion, language })
       })
       
+      const responseText = await response.text()
+      
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to get movie recommendations')
+        let errorMessage = 'Failed to get movie recommendations'
+        try {
+          const errorData = JSON.parse(responseText)
+          errorMessage = errorData.error || errorMessage
+        } catch {
+          // If response is not JSON, use the text as error message
+          errorMessage = responseText || errorMessage
+        }
+        throw new Error(errorMessage)
       }
       
-      return response.json()
+      try {
+        return JSON.parse(responseText)
+      } catch (parseError) {
+        console.error('Failed to parse response:', responseText)
+        throw new Error('Invalid response format from server')
+      }
     },
     onSuccess: (data) => {
       setResult(data)
