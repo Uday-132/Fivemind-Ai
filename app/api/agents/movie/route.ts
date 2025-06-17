@@ -75,10 +75,15 @@ const URL_MAPPINGS = {
   }
 }
 
-// Function to call the Python script
+// Function to call the Python script with timeout
 const callPythonScript = async (emotion: string, language: string): Promise<MovieRecommendation> => {
   return new Promise((resolve, reject) => {
-    const scriptPath = path.join(process.cwd(), 'movie_recommendation.py')
+    // Set a timeout for the Python script execution (5 seconds)
+    const timeout = setTimeout(() => {
+      pythonProcess.kill()
+      reject(new Error('Python script execution timeout'))
+    }, 5000)
+
     const pythonProcess = spawn('python', ['-c', `
 import sys
 sys.path.append('${process.cwd().replace(/\\/g, '\\\\')}')
@@ -101,6 +106,8 @@ print(json.dumps(result))
     })
 
     pythonProcess.on('close', (code) => {
+      clearTimeout(timeout)
+      
       if (code !== 0) {
         console.error('Python script error:', errorOutput)
         reject(new Error(`Python script failed with code ${code}: ${errorOutput}`))
@@ -138,6 +145,11 @@ print(json.dumps(result))
         reject(new Error(`Failed to parse movie recommendations: ${error instanceof Error ? error.message : 'Unknown error'}`))
       }
     })
+
+    pythonProcess.on('error', (error) => {
+      clearTimeout(timeout)
+      reject(new Error(`Failed to start Python process: ${error.message}`))
+    })
   })
 }
 
@@ -145,8 +157,8 @@ print(json.dumps(result))
 const generateMockMovieData = async (emotion: string, language: string): Promise<MovieRecommendation> => {
   console.log('Generating mock movie data...')
   
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1500))
+  // Reduced delay for faster response
+  await new Promise(resolve => setTimeout(resolve, 500))
 
   const languageKey = language.toLowerCase() as keyof typeof URL_MAPPINGS
   const emotionKey = emotion.toLowerCase() as keyof typeof URL_MAPPINGS[typeof languageKey]
@@ -286,14 +298,22 @@ export async function POST(request: NextRequest) {
 
     let result: MovieRecommendation
 
-    try {
-      // Try to use the Python script first
-      result = await callPythonScript(emotion, language)
-      console.log('Successfully used Python script')
-    } catch (error) {
-      console.log('Python script failed, using mock data:', error)
-      // Fallback to mock data if Python script fails
+    // In production, skip Python script to avoid timeouts and use mock data directly
+    const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production'
+    
+    if (isProduction) {
+      console.log('Production environment detected, using mock data for faster response')
       result = await generateMockMovieData(emotion, language)
+    } else {
+      try {
+        // Try to use the Python script first in development
+        result = await callPythonScript(emotion, language)
+        console.log('Successfully used Python script')
+      } catch (error) {
+        console.log('Python script failed, using mock data:', error)
+        // Fallback to mock data if Python script fails
+        result = await generateMockMovieData(emotion, language)
+      }
     }
 
     return NextResponse.json(result)
