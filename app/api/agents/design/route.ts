@@ -242,21 +242,14 @@ async function generateCodeFromAnalysis(analysis: any, fullAnalysis: string) {
   const uniqueId = analysis.uniqueId || Math.random().toString(36).substring(7)
   
   const prompt = `
-Create a STRICTLY VERTICAL React component with Tailwind CSS. ABSOLUTELY NO HORIZONTAL LAYOUTS ALLOWED.
+Create a VERTICAL-ONLY React component with Tailwind CSS. ALL elements must stack from TOP to BOTTOM.
 
-🚫 FORBIDDEN - NEVER USE THESE:
-- grid-cols-2, grid-cols-3, grid-cols-4, grid-cols-5, grid-cols-6, etc.
-- md:grid-cols-2, lg:grid-cols-3, xl:grid-cols-4, etc.
-- flex-row, flex justify-between with multiple items
-- Any side-by-side arrangements for main sections
-
-✅ REQUIRED - ONLY USE THESE:
-- grid-cols-1 (ONLY)
-- flex-col (ONLY)
-- block with vertical stacking
-- ${randomLayout} for main container
-- ${randomSpacing} for vertical spacing
-- ${randomContainer} for width control
+CRITICAL REQUIREMENTS - NO HORIZONTAL LAYOUTS:
+- Main container MUST use: ${randomLayout}
+- ALL sections MUST stack vertically with ${randomSpacing}
+- Container: ${randomContainer}
+- NO flex-row, NO grid-cols-2 or higher, NO horizontal arrangements
+- ONLY vertical stacking allowed
 
 DESIGN SPECIFICATIONS:
 - Components: ${analysis.components?.join(', ') || 'Modern UI components'}
@@ -265,37 +258,35 @@ DESIGN SPECIFICATIONS:
 - Theme: ${analysis.theme || 'Modern design'}
 - Unique ID: ${uniqueId}
 
-MANDATORY STRUCTURE (TOP TO BOTTOM ONLY):
-```
-<div className="${randomLayout} ${randomSpacing} min-h-screen">
-  <header className="w-full">Header Section</header>
-  <main className="w-full flex-1">
-    <section className="w-full py-8">Hero Section</section>
-    <section className="w-full py-8">Content Section 1</section>
-    <section className="w-full py-8">Content Section 2</section>
-  </main>
-  <footer className="w-full">Footer Section</footer>
-</div>
-```
+MANDATORY VERTICAL STRUCTURE:
+1. Header/Navigation - full width at top
+2. Hero/Banner section - full width below header
+3. Content sections - each taking full width, stacked vertically
+4. Footer - full width at bottom
 
-CRITICAL RULES:
-1. Every major section takes full width (w-full)
-2. All sections stack vertically (no side-by-side)
-3. Use ONLY grid-cols-1 for any grids
-4. Use ONLY flex-col for any flex containers
-5. Individual cards can have internal layout but sections must be vertical
+STRICT TECHNICAL RULES:
+- Root container: <div className="${randomLayout} ${randomSpacing} min-h-screen">
+- Each section: <section className="w-full">
+- NO side-by-side elements except within individual cards
+- Use py-8, py-12, py-16 for vertical padding
+- Cards/components within sections can have internal horizontal layout
+- But main sections MUST be stacked vertically
+
+FORBIDDEN CLASSES:
+- flex-row, grid-cols-2, grid-cols-3, grid-cols-4, etc.
+- Any horizontal grid or flex arrangements for main sections
 
 RETURN ONLY VALID JSON:
 
 {
   "code": {
-    "react": "VERTICAL-ONLY React component with ${randomLayout} and NO horizontal layouts",
-    "html": "VERTICAL-ONLY HTML structure with sections stacked top to bottom",
-    "css": "VERTICAL-ONLY CSS with flex-direction: column and grid-template-columns: 1fr"
+    "react": "Complete React component with STRICT vertical layout using ${randomLayout}",
+    "html": "HTML with vertical-only structure and semantic elements",
+    "css": "CSS with vertical stacking and ${randomSpacing}"
   }
 }
 
-ABSOLUTE REQUIREMENT: Every section must be below the previous one, never beside it!
+REMEMBER: Every major section must be stacked vertically from top to bottom!
 `
 
   try {
@@ -304,7 +295,7 @@ ABSOLUTE REQUIREMENT: Every section must be below the previous one, never beside
       messages: [
         {
           role: 'system',
-          content: 'You are an expert frontend developer who creates STRICTLY VERTICAL React components. ABSOLUTE RULES: 1) NEVER use grid-cols-2 or higher 2) NEVER use flex-row 3) NEVER use responsive grid columns like md:grid-cols-2 4) ALL sections must stack vertically from top to bottom 5) ONLY use grid-cols-1, flex-col, or block layouts 6) Each section takes full width and appears below the previous section. VIOLATION OF THESE RULES IS FORBIDDEN.'
+          content: 'You are an expert frontend developer who creates VERTICAL-ONLY React components with Tailwind CSS. CRITICAL: All major sections must stack from top to bottom. Never use horizontal layouts for main sections. Always use flex-col, grid-cols-1, or block layouts for the main container. Generate unique, accessible code with strict vertical stacking.'
         },
         {
           role: 'user',
@@ -312,7 +303,7 @@ ABSOLUTE REQUIREMENT: Every section must be below the previous one, never beside
         }
       ],
       max_tokens: 3000,
-      temperature: 0.3
+      temperature: 0.7
     })
 
     const content = response.choices[0]?.message?.content
@@ -1060,20 +1051,18 @@ function extractTypography(styles: any): string {
 }
 
 function ensureVerticalLayout(result: any) {
-  // Aggressively post-process the generated code to ensure ONLY vertical layouts
+  // Post-process the generated code to ensure vertical layouts
   if (result.code) {
-    // Fix React code - be very aggressive
+    // Fix React code
     if (result.code.react) {
       result.code.react = result.code.react
-        // Replace ALL horizontal grid layouts with vertical ones
-        .replace(/grid-cols-([2-9]|\d{2,})/g, 'grid-cols-1')
-        .replace(/(sm|md|lg|xl|2xl):grid-cols-([2-9]|\d{2,})/g, '$1:grid-cols-1')
-        // Replace ALL flex-row with flex-col
+        // Replace horizontal grid layouts with vertical ones
+        .replace(/grid-cols-[2-9](\d*)/g, 'grid-cols-1')
+        .replace(/md:grid-cols-[2-9](\d*)/g, 'md:grid-cols-1')
+        .replace(/lg:grid-cols-[2-9](\d*)/g, 'lg:grid-cols-1')
+        .replace(/xl:grid-cols-[2-9](\d*)/g, 'xl:grid-cols-1')
+        // Replace flex-row with flex-col
         .replace(/flex-row/g, 'flex-col')
-        // Replace justify-between with justify-center for vertical layouts
-        .replace(/justify-between/g, 'justify-center')
-        // Replace items-center with items-stretch for better vertical flow
-        .replace(/items-center/g, 'items-stretch')
         // Ensure main containers use vertical layouts
         .replace(/className="([^"]*\s+)?flex(\s+[^"]*)?"/g, (match: string) => {
           if (!match.includes('flex-col') && !match.includes('flex-row')) {
@@ -1081,42 +1070,21 @@ function ensureVerticalLayout(result: any) {
           }
           return match.replace('flex-row', 'flex-col')
         })
-        // Force grid containers to be vertical
-        .replace(/className="([^"]*\s+)?grid(\s+[^"]*)?"/g, (match: string) => {
-          if (!match.includes('grid-cols-1')) {
-            return match.replace('grid', 'grid grid-cols-1')
-          }
-          return match
-        })
-        // Remove any remaining horizontal arrangements
-        .replace(/space-x-\d+/g, 'space-y-4')
-        .replace(/gap-x-\d+/g, 'gap-y-4')
-        // Final safety check - replace any missed horizontal patterns
-        .replace(/grid\s+grid-cols-[2-9]/g, 'grid grid-cols-1')
-        .replace(/flex\s+flex-row/g, 'flex flex-col')
-        // Ensure no responsive horizontal grids slip through
-        .replace(/(sm|md|lg|xl|2xl):grid-cols-[2-9]/g, '$1:grid-cols-1')
     }
     
-    // Fix HTML code - be very aggressive
+    // Fix HTML code
     if (result.code.html) {
       result.code.html = result.code.html
-        .replace(/class="([^"]*\s+)?grid-cols-([2-9]|\d{2,})([^"]*)?"/g, 'class="$1grid-cols-1$3"')
-        .replace(/class="([^"]*\s+)?(sm|md|lg|xl|2xl):grid-cols-([2-9]|\d{2,})([^"]*)?"/g, 'class="$1$2:grid-cols-1$4"')
+        .replace(/class="([^"]*\s+)?grid-cols-[2-9](\d*)([^"]*)?"/g, 'class="$1grid-cols-1$3"')
         .replace(/class="([^"]*\s+)?flex-row([^"]*)?"/g, 'class="$1flex-col$2"')
-        .replace(/class="([^"]*\s+)?justify-between([^"]*)?"/g, 'class="$1justify-center$2"')
     }
     
-    // Fix CSS code - be very aggressive
+    // Fix CSS code
     if (result.code.css) {
       result.code.css = result.code.css
-        .replace(/grid-template-columns:\s*repeat\(([2-9]|\d{2,}),/g, 'grid-template-columns: repeat(1,')
-        .replace(/grid-template-columns:\s*[^;]+;/g, 'grid-template-columns: 1fr;')
+        .replace(/grid-template-columns:\s*repeat\([2-9]\d*,/g, 'grid-template-columns: repeat(1,')
         .replace(/flex-direction:\s*row/g, 'flex-direction: column')
-        .replace(/display:\s*flex;\s*flex-direction:\s*row/g, 'display: flex; flex-direction: column')
         .replace(/display:\s*grid;\s*grid-template-columns:\s*[^;]+;/g, 'display: grid; grid-template-columns: 1fr;')
-        // Force any remaining grid layouts to be single column
-        .replace(/grid-template-columns:\s*[^;]*fr\s+[^;]*fr/g, 'grid-template-columns: 1fr')
     }
   }
   
