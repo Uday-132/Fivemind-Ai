@@ -45,15 +45,15 @@
     "uuid": "^9.0.1",
     "youtube-transcript": "^1.0.6",
     "zod": "^3.25.64",
-    "zustand": "^4.4.7"
-  },
-  "devDependencies": {
+    "zustand": "^4.4.7",
     "@types/node": "^20",
     "@types/react": "^18.3.23",
     "@types/react-dom": "^18",
     "@types/uuid": "^9.0.7",
-    "eslint": "^8",
-    "eslint-config-next": "14.0.4",
     "typescript": "^5.8.3"
+  },
+  "devDependencies": {
+    "eslint": "^8",
+    "eslint-config-next": "14.0.4"
   }
 }
