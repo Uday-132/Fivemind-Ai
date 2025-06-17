@@ -84,6 +84,14 @@ export default function DesignAgentPage() {
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
           Convert Figma designs or images into clean, responsive Tailwind CSS + React code
         </p>
+        
+        {/* AI Disclaimer */}
+        <div className="max-w-2xl mx-auto">
+          <div className="flex items-center justify-center space-x-2 text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 px-4 py-2 rounded-lg border border-amber-200 dark:border-amber-800">
+            <AlertCircle className="h-4 w-4 flex-shrink-0" />
+            <span>The AI can make mistakes. Please verify and test the generated code before using in production.</span>
+          </div>
+        </div>
       </div>
 
       {/* Input Form */}
@@ -246,6 +254,15 @@ export default function DesignAgentPage() {
               <CardDescription>
                 Choose your preferred format below
               </CardDescription>
+              
+              {/* AI Disclaimer for Results */}
+              <div className="flex items-start space-x-2 text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 px-3 py-2 rounded-md border border-amber-200 dark:border-amber-800 mt-3">
+                <AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium">AI-Generated Code</p>
+                  <p className="text-xs text-amber-700 dark:text-amber-300">Please review, test, and modify the code as needed. The AI may not capture all design nuances or accessibility requirements.</p>
+                </div>
+              </div>
               <div className="flex space-x-2 mt-4">
                 <Button
                   variant={activeTab === 'react' ? 'default' : 'outline'}
