@@ -31,23 +31,18 @@ const nextConfig = {
     serverComponentsExternalPackages: ['sharp'],
     optimizeCss: false, // ✅ Optional: prevent rare trace bugs
   },
-  output: 'standalone',
+  // Disable build trace collection to prevent stack overflow
+  outputFileTracing: false,
   webpack: (config, { isServer }) => {
+    // Minimal webpack config to prevent circular references
     config.resolve.symlinks = false;
+    
+    // Simple alias setup
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': path.resolve(__dirname, './'),
     };
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
-        crypto: false,
-      };
-    }
-    config.resolve.modules = ['node_modules'];
+    
     return config;
   },
   env: {
