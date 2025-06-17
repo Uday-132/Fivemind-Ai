@@ -108,7 +108,21 @@ print(json.dumps(result))
       }
 
       try {
-        const result = JSON.parse(output.trim())
+        // Clean the output - remove any non-JSON content
+        const cleanOutput = output.trim()
+        console.log('Raw Python output:', cleanOutput)
+        
+        // Try to find JSON in the output
+        let jsonStart = cleanOutput.indexOf('{')
+        let jsonEnd = cleanOutput.lastIndexOf('}')
+        
+        if (jsonStart === -1 || jsonEnd === -1) {
+          throw new Error('No valid JSON found in Python output')
+        }
+        
+        const jsonString = cleanOutput.substring(jsonStart, jsonEnd + 1)
+        const result = JSON.parse(jsonString)
+        
         if (result.error) {
           reject(new Error(result.error))
           return
@@ -120,7 +134,8 @@ print(json.dumps(result))
         })
       } catch (error) {
         console.error('Failed to parse Python output:', output)
-        reject(new Error('Failed to parse movie recommendations'))
+        console.error('Parse error:', error)
+        reject(new Error(`Failed to parse movie recommendations: ${error instanceof Error ? error.message : 'Unknown error'}`))
       }
     })
   })
@@ -247,7 +262,18 @@ const generateMockMovieTitles = (emotion: string, language: string): string[] =>
 
 export async function POST(request: NextRequest) {
   try {
-    const { emotion, language } = await request.json()
+    let requestBody
+    try {
+      requestBody = await request.json()
+    } catch (jsonError) {
+      console.error('Invalid JSON in request:', jsonError)
+      return NextResponse.json(
+        { error: 'Invalid JSON in request body' },
+        { status: 400 }
+      )
+    }
+
+    const { emotion, language } = requestBody
 
     if (!emotion || !language) {
       return NextResponse.json(
@@ -275,7 +301,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Movie recommendation error:', error)
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to get movie recommendations' },
+      { 
+        error: error instanceof Error ? error.message : 'Failed to get movie recommendations',
+        details: 'Check server logs for more information'
+      },
       { status: 500 }
     )
   }
