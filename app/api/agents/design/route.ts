@@ -1064,7 +1064,7 @@ function ensureVerticalLayout(result: any) {
         // Replace flex-row with flex-col
         .replace(/flex-row/g, 'flex-col')
         // Ensure main containers use vertical layouts
-        .replace(/className="([^"]*\s+)?flex(\s+[^"]*)?"/g, (match) => {
+        .replace(/className="([^"]*\s+)?flex(\s+[^"]*)?"/g, (match: string) => {
           if (!match.includes('flex-col') && !match.includes('flex-row')) {
             return match.replace('flex', 'flex flex-col')
           }
