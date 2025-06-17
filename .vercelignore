@@ -9,8 +9,6 @@ requirements.txt
 # Node modules that can cause issues
 node_modules/puppeteer/
 node_modules/.cache/
-node_modules/sharp/
-node_modules/@types/
 node_modules/.bin/
 node_modules/.pnpm/
 
