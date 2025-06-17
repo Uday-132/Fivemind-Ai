@@ -17,7 +17,7 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: '**.blob.core.windows.net',
+        hostname: 'oaidalleapiprodscus.blob.core.windows.net',
         port: '',
         pathname: '/**',
       }
@@ -29,41 +29,12 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ['sharp']
   },
-  // Disable build trace collection to prevent stack overflow
-  output: 'standalone',
-  // Simplified webpack configuration
-  webpack: (config, { isServer }) => {
-    // Disable symlinks to prevent circular references
-    config.resolve.symlinks = false;
-    
-    // Optimize resolve configuration
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      '@': require('path').resolve(__dirname, './'),
-    };
-    
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        fs: false,
-        net: false,
-        tls: false,
-        crypto: false,
-      };
-    }
-    
-    // Optimize module resolution
-    config.resolve.modules = ['node_modules'];
-    
-    return config;
-  },
   // Environment variables (only expose what's needed)
   env: {
     DEEPSEEK_API_KEY: process.env.DEEPSEEK_API_KEY || '',
     GROQ_API_KEY: process.env.GROQ_API_KEY || '',
     FIGMA_ACCESS_TOKEN: process.env.FIGMA_ACCESS_TOKEN || '',
     SESSION_SECRET: process.env.SESSION_SECRET || '',
-    // Don't expose DATABASE_URL in client-side code
   }
 }
 
