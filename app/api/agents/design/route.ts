@@ -230,10 +230,10 @@ Be specific and accurate based on what you see in the image.
 }
 
 async function generateCodeFromAnalysis(analysis: any, fullAnalysis: string) {
-  // Add randomization to the prompt for more varied results
-  const layoutStyles = ['flexbox with flex-col', 'CSS Grid with grid-rows', 'block layout with vertical flow']
-  const spacingOptions = ['space-y-6', 'space-y-8', 'space-y-4', 'gap-6', 'gap-8']
-  const containerStyles = ['max-w-4xl mx-auto', 'max-w-6xl mx-auto', 'container mx-auto', 'w-full max-w-screen-xl mx-auto']
+  // Force vertical layout options only
+  const layoutStyles = ['flex flex-col', 'grid grid-cols-1', 'block space-y-8']
+  const spacingOptions = ['space-y-6', 'space-y-8', 'space-y-10', 'space-y-12']
+  const containerStyles = ['max-w-4xl mx-auto px-4', 'max-w-6xl mx-auto px-6', 'container mx-auto px-4', 'w-full max-w-screen-xl mx-auto px-8']
   
   const randomLayout = layoutStyles[Math.floor(Math.random() * layoutStyles.length)]
   const randomSpacing = spacingOptions[Math.floor(Math.random() * spacingOptions.length)]
@@ -242,44 +242,51 @@ async function generateCodeFromAnalysis(analysis: any, fullAnalysis: string) {
   const uniqueId = analysis.uniqueId || Math.random().toString(36).substring(7)
   
   const prompt = `
-Create a unique, modern React component with Tailwind CSS. Use this specific configuration:
+Create a VERTICAL-ONLY React component with Tailwind CSS. ALL elements must stack from TOP to BOTTOM.
 
-DESIGN REQUIREMENTS:
-- Components: ${analysis.components?.join(', ') || 'Modern UI components'}
-- Layout Style: ${randomLayout}
+CRITICAL REQUIREMENTS - NO HORIZONTAL LAYOUTS:
+- Main container MUST use: ${randomLayout}
+- ALL sections MUST stack vertically with ${randomSpacing}
 - Container: ${randomContainer}
-- Spacing: ${randomSpacing}
+- NO flex-row, NO grid-cols-2 or higher, NO horizontal arrangements
+- ONLY vertical stacking allowed
+
+DESIGN SPECIFICATIONS:
+- Components: ${analysis.components?.join(', ') || 'Modern UI components'}
 - Colors: ${analysis.colors?.join(', ') || 'Modern color palette'}
 - Typography: ${analysis.typography || 'Clean typography'}
 - Theme: ${analysis.theme || 'Modern design'}
 - Unique ID: ${uniqueId}
 
-LAYOUT STRUCTURE (TOP-TO-BOTTOM):
-1. Header/Navigation (if needed) - sticky or fixed at top
-2. Hero/Banner section - prominent visual element
-3. Main content sections - stacked vertically
-4. Footer (if needed) - at bottom
+MANDATORY VERTICAL STRUCTURE:
+1. Header/Navigation - full width at top
+2. Hero/Banner section - full width below header
+3. Content sections - each taking full width, stacked vertically
+4. Footer - full width at bottom
 
-TECHNICAL REQUIREMENTS:
-- Use ${randomLayout} for vertical stacking
-- Apply ${randomSpacing} for consistent spacing
-- Implement ${randomContainer} for responsive width
-- Include hover effects and transitions
-- Add proper semantic HTML tags
-- Ensure mobile-first responsive design
-- Use modern Tailwind CSS classes
+STRICT TECHNICAL RULES:
+- Root container: <div className="${randomLayout} ${randomSpacing} min-h-screen">
+- Each section: <section className="w-full">
+- NO side-by-side elements except within individual cards
+- Use py-8, py-12, py-16 for vertical padding
+- Cards/components within sections can have internal horizontal layout
+- But main sections MUST be stacked vertically
 
-IMPORTANT: Return ONLY valid JSON. No additional text or explanations.
+FORBIDDEN CLASSES:
+- flex-row, grid-cols-2, grid-cols-3, grid-cols-4, etc.
+- Any horizontal grid or flex arrangements for main sections
+
+RETURN ONLY VALID JSON:
 
 {
   "code": {
-    "react": "Complete functional React component with unique design and ${randomLayout}",
-    "html": "Clean HTML structure with semantic elements and vertical flow",
-    "css": "Modern CSS with Tailwind classes and responsive design"
+    "react": "Complete React component with STRICT vertical layout using ${randomLayout}",
+    "html": "HTML with vertical-only structure and semantic elements",
+    "css": "CSS with vertical stacking and ${randomSpacing}"
   }
 }
 
-Make each component unique with creative use of the specified colors and layout style.
+REMEMBER: Every major section must be stacked vertically from top to bottom!
 `
 
   try {
@@ -288,7 +295,7 @@ Make each component unique with creative use of the specified colors and layout 
       messages: [
         {
           role: 'system',
-          content: 'You are an expert frontend developer who creates pixel-perfect, accessible React components with Tailwind CSS. Always generate unique, high-quality code that matches the design requirements exactly.'
+          content: 'You are an expert frontend developer who creates VERTICAL-ONLY React components with Tailwind CSS. CRITICAL: All major sections must stack from top to bottom. Never use horizontal layouts for main sections. Always use flex-col, grid-cols-1, or block layouts for the main container. Generate unique, accessible code with strict vertical stacking.'
         },
         {
           role: 'user',
@@ -314,7 +321,9 @@ Make each component unique with creative use of the specified colors and layout 
         rawJson = rawJson.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F-\x9F]/g, '')
         
         // Try to parse as-is first
-        return JSON.parse(rawJson)
+        const result = JSON.parse(rawJson)
+        // Post-process to ensure vertical layouts
+        return ensureVerticalLayout(result)
       } catch (parseError) {
         console.error('Initial JSON parse failed, trying cleanup:', parseError)
         
@@ -334,7 +343,8 @@ Make each component unique with creative use of the specified colors and layout 
             // Fix unescaped backslashes (but not already escaped ones)
             .replace(/\\(?!["\\/bfnrt])/g, '\\\\')
           
-          return JSON.parse(cleanJson)
+          const result = JSON.parse(cleanJson)
+          return ensureVerticalLayout(result)
         } catch (secondError) {
           console.error('Second JSON parse failed, using fallback:', secondError)
           console.error('Raw content sample:', jsonMatch[0].substring(0, 500))
@@ -500,7 +510,7 @@ export default function ${componentName}Form() {
         {/* Stats Section - First vertical section */}
         <section className="mb-8">
           <h2 className="text-lg font-medium text-gray-900 mb-4">Overview</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 gap-6">
             {stats.map((stat, index) => (
               <div key={index} className="bg-white overflow-hidden shadow rounded-lg">
                 <div className="p-5">
@@ -640,7 +650,7 @@ export default function ${componentName}Form() {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-8">
             {features.map((feature, index) => (
               <div key={index} className="bg-white overflow-hidden shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300">
                 <div className="p-6">
@@ -1038,6 +1048,47 @@ function extractTypography(styles: any): string {
   if (textStyles.length === 0) return 'Clean typography'
   
   return 'Custom typography with multiple font weights and sizes'
+}
+
+function ensureVerticalLayout(result: any) {
+  // Post-process the generated code to ensure vertical layouts
+  if (result.code) {
+    // Fix React code
+    if (result.code.react) {
+      result.code.react = result.code.react
+        // Replace horizontal grid layouts with vertical ones
+        .replace(/grid-cols-[2-9](\d*)/g, 'grid-cols-1')
+        .replace(/md:grid-cols-[2-9](\d*)/g, 'md:grid-cols-1')
+        .replace(/lg:grid-cols-[2-9](\d*)/g, 'lg:grid-cols-1')
+        .replace(/xl:grid-cols-[2-9](\d*)/g, 'xl:grid-cols-1')
+        // Replace flex-row with flex-col
+        .replace(/flex-row/g, 'flex-col')
+        // Ensure main containers use vertical layouts
+        .replace(/className="([^"]*\s+)?flex(\s+[^"]*)?"/g, (match) => {
+          if (!match.includes('flex-col') && !match.includes('flex-row')) {
+            return match.replace('flex', 'flex flex-col')
+          }
+          return match.replace('flex-row', 'flex-col')
+        })
+    }
+    
+    // Fix HTML code
+    if (result.code.html) {
+      result.code.html = result.code.html
+        .replace(/class="([^"]*\s+)?grid-cols-[2-9](\d*)([^"]*)?"/g, 'class="$1grid-cols-1$3"')
+        .replace(/class="([^"]*\s+)?flex-row([^"]*)?"/g, 'class="$1flex-col$2"')
+    }
+    
+    // Fix CSS code
+    if (result.code.css) {
+      result.code.css = result.code.css
+        .replace(/grid-template-columns:\s*repeat\([2-9]\d*,/g, 'grid-template-columns: repeat(1,')
+        .replace(/flex-direction:\s*row/g, 'flex-direction: column')
+        .replace(/display:\s*grid;\s*grid-template-columns:\s*[^;]+;/g, 'display: grid; grid-template-columns: 1fr;')
+    }
+  }
+  
+  return result
 }
 
 export async function POST(request: NextRequest) {
